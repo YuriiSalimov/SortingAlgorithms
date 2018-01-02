@@ -8,9 +8,9 @@ import java.util.Random;
 
 public final class Tester {
 
-    private static final int MIN_ARRAY_LENGTH = 10;
-    private static final int MAX_ARRAY_LENGTH = 1000;
-    private static final int STEP = 1;
+    private static final int MIN_ARRAY_LENGTH = 1000;
+    private static final int MAX_ARRAY_LENGTH = 10000;
+    private static final int STEP = 10000;
     private static final int ITERATIONS = 100;
     private static final String PATH_PREFIX = "results/";
     private static final String PATH_SUFFIX = ".sort";
@@ -19,20 +19,21 @@ public final class Tester {
 
     private final Sort sort;
     private long prevTime;
+    private long prevPrevTime;
 
     public Tester(final Sort sort) {
         this.sort = sort;
     }
 
     public void run() {
-        System.out.println(getName() + " - start");
         try {
+            System.out.println(getSortName() + " - start");
             final String table = createTable();
             saveTable(table);
+            System.out.println(getSortName() + " - DONE");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        System.out.println(getName() + " - DONE");
     }
 
     private String createTable() {
@@ -42,7 +43,7 @@ public final class Tester {
             if (isValidTime(time)) {
                 i -= STEP;
             } else {
-                this.prevTime = time;
+                saveTime(time);
                 sb.append(i).append(" ").append(time).append("\n");
             }
         }
@@ -74,14 +75,20 @@ public final class Tester {
     }
 
     private boolean isValidTime(final long time) {
-        return (this.prevTime != 0) && (time - this.prevTime) > ((double) this.prevTime * TIME_RANGE);
+        return (this.prevPrevTime != 0) &&
+                (time - this.prevPrevTime) > ((double) this.prevPrevTime * TIME_RANGE);
+    }
+
+    private void saveTime(final long time) {
+        this.prevPrevTime = this.prevTime;
+        this.prevTime = time;
     }
 
     private String getPath() {
-        return PATH_PREFIX + getName() + PATH_SUFFIX;
+        return PATH_PREFIX + getSortName() + PATH_SUFFIX;
     }
 
-    private String getName() {
+    private String getSortName() {
         return this.sort.getClass().getSimpleName();
     }
 }
