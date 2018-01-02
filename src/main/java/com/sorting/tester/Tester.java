@@ -2,6 +2,8 @@ package com.sorting.tester;
 
 import com.sorting.algorithms.Sort;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 public final class Tester {
@@ -10,12 +12,13 @@ public final class Tester {
     private static final int MAX_ARRAY_LENGTH = 1000;
     private static final int STEP = 1;
     private static final int ITERATIONS = 100;
-    private static final String PATH_PREFIX = "";
+    private static final String PATH_PREFIX = "results/";
     private static final String PATH_SUFFIX = ".sort";
+    private static final double TIME_RANGE = 0.3;
     private static final Random RANDOM = new Random();
 
     private final Sort sort;
-    private long prevTime = 0;
+    private long prevTime;
 
     public Tester(final Sort sort) {
         this.sort = sort;
@@ -25,9 +28,7 @@ public final class Tester {
         System.out.println(getName() + " - start");
         try {
             final String table = createTable();
-            final String path = getPath();
-            final Loader loader = new Loader(path, table);
-            loader.write();
+            saveTable(table);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -38,7 +39,7 @@ public final class Tester {
         final StringBuilder sb = new StringBuilder();
         for (int i = MIN_ARRAY_LENGTH; i <= MAX_ARRAY_LENGTH; i += STEP) {
             final long time = calcTime(i);
-            if (this.prevTime != 0 && (time - this.prevTime) > ((double) this.prevTime * 0.3)) {
+            if (isValidTime(time)) {
                 i -= STEP;
             } else {
                 this.prevTime = time;
@@ -46,6 +47,12 @@ public final class Tester {
             }
         }
         return sb.toString();
+    }
+
+    private void saveTable(final String table) throws IOException {
+        final String path = getPath();
+        final Loader loader = new Loader(path, table);
+        loader.write();
     }
 
     private long calcTime(final int arrayLength) {
@@ -64,6 +71,10 @@ public final class Tester {
             array[i] = RANDOM.nextInt();
         }
         return array;
+    }
+
+    private boolean isValidTime(final long time) {
+        return (this.prevTime != 0) && (time - this.prevTime) > ((double) this.prevTime * TIME_RANGE);
     }
 
     private String getPath() {

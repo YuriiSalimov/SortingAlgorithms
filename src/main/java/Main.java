@@ -30,7 +30,7 @@ public class Main {
         test(new OddEvenSort());
         test(new OptimizedBubbleSort());
         test(new QuickSort());
-        test(new RadixSort());
+        //test(new RadixSort());
         test(new RecursiveInsertionSort());
         test(new SelectionSort());
         test(new ShellSort());
