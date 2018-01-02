@@ -16,4 +16,11 @@
 * [Radix Sort](/src/main/java/com/sorting/algorithms/RadixSort)
 * [Selection Sort](/src/main/java/com/sorting/algorithms/SelectionSort)
 * [Shell Sort](/src/main/java/com/sorting/algorithms/ShellSort)
+
+#### Time Comparison of Sort Algorithms
+array length = [10, 1000]
+
+iterations = 100
+
+![Times](/results/TimesFrom10To1000.png)
  
