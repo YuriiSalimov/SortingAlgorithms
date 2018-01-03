@@ -9,20 +9,20 @@ import com.sorting.algorithms.MergeSort.MergeSort;
 import com.sorting.algorithms.OddEvenSort.OddEvenSort;
 import com.sorting.algorithms.OptimizedBubbleSort.OptimizedBubbleSort;
 import com.sorting.algorithms.QuickSort.QuickSort;
-import com.sorting.algorithms.RadixSort.RadixSort;
 import com.sorting.algorithms.RecursiveInsertionSort.RecursiveInsertionSort;
 import com.sorting.algorithms.SelectionSort.SelectionSort;
 import com.sorting.algorithms.ShellSort.ShellSort;
 import com.sorting.algorithms.Sort;
-import com.sorting.tester.Config;
-import com.sorting.tester.SortTimer;
-import com.sorting.tester.tester.MultipleTester;
-import com.sorting.tester.tester.SingleTester;
-import com.sorting.tester.tester.Tester;
-import com.sorting.tester.timer.MillisTimer;
-import com.sorting.tester.timer.NanoTimer;
-import com.sorting.tester.timer.SecondTimer;
-import com.sorting.tester.timer.Timer;
+import com.sorting.demonstration.Config;
+import com.sorting.demonstration.SortTimer;
+import com.sorting.demonstration.arrays.*;
+import com.sorting.demonstration.tester.MultipleTester;
+import com.sorting.demonstration.tester.SingleTester;
+import com.sorting.demonstration.tester.Tester;
+import com.sorting.demonstration.timer.MillisTimer;
+import com.sorting.demonstration.timer.NanoTimer;
+import com.sorting.demonstration.timer.SecondTimer;
+import com.sorting.demonstration.timer.Timer;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -34,20 +34,22 @@ public class Main {
         NANOS, MILLIS, SECONDS
     }
 
-    private static final TimeUnits TIME_UNIT = TimeUnits.SECONDS;
+    private static final TimeUnits TIME_UNIT = TimeUnits.MILLIS;
     private static final int MIN_ARRAY_LENGTH = 10;
     private static final int MAX_ARRAY_LENGTH = 1000;
     private static final int STEP = 1;
-    private static final int ITERATIONS = 100;
+    private static final int ITERATIONS = 10000;
+    private static final boolean MIXED_ARRAY = true;
+    private static final boolean CACHE_ARRAY = true;
+    private static final boolean COPY_ARRAY = true;
+    private static final boolean MULTIPLE = true;
+    private static final int THREADS_NUMBER = 3;
     private static final String PATH_PREFIX = "results/";
     private static final String PATH_SUFFIX = ".sort";
-    private static final double TIME_RANGE = 0.3;
-    private static final boolean MULTIPLE = true;
-    private static final int THREADS_NUMBER = 2;
 
+    private static ArraysFactory arraysFactory;
+    private static ExecutorService executorService;
     private static Config config;
-    private static Timer timer;
-    private static ExecutorService executor;
 
     public static void main(String[] args) {
         test(new BubbleSort());
@@ -61,10 +63,10 @@ public class Main {
         test(new OddEvenSort());
         test(new OptimizedBubbleSort());
         test(new QuickSort());
+        //test(new RadixSort());
         test(new RecursiveInsertionSort());
         test(new SelectionSort());
         test(new ShellSort());
-        //test(new RadixSort());
         executorShutdown();
     }
 
@@ -76,15 +78,16 @@ public class Main {
     private static Tester createTester(final Sort sort) {
         final String name = getSortName(sort);
         final SortTimer timer = createSortTimer(sort);
+        final ArraysFactory arraysFactory = getArraysFactory();
         final Config config = getConfig();
-        final Tester tester = new SingleTester(name, timer, config);
+        final Tester tester = new SingleTester(name, timer, arraysFactory, config);
         return checkMultiple(tester);
     }
 
     private static Tester checkMultiple(final Tester tester) {
         final Tester resultTester;
         if (MULTIPLE) {
-            final Executor executor = getExecutor();
+            final Executor executor = getExecutorService();
             resultTester = new MultipleTester(tester, executor);
         } else {
             resultTester = tester;
@@ -92,34 +95,27 @@ public class Main {
         return resultTester;
     }
 
-    private static ExecutorService getExecutor() {
-        if (executor == null) {
-            executor = createExecutor();
+    private static ExecutorService getExecutorService() {
+        if (executorService == null) {
+            executorService = createExecutorService();
         }
-        return executor;
+        return executorService;
     }
 
-    private static ExecutorService createExecutor() {
+    private static ExecutorService createExecutorService() {
         return Executors.newFixedThreadPool(THREADS_NUMBER);
     }
 
     private static void executorShutdown() {
-        if (executor != null) {
-            executor.shutdown();
-            executor = null;
+        if (executorService != null) {
+            executorService.shutdown();
+            executorService = null;
         }
     }
 
     private static SortTimer createSortTimer(final Sort sort) {
-        final Timer timer = getTimer();
+        final Timer timer = createTimer();
         return new SortTimer(sort, timer);
-    }
-
-    private static Timer getTimer() {
-        if (timer == null) {
-            timer = createTimer();
-        }
-        return timer;
     }
 
     private static Timer createTimer() {
@@ -132,6 +128,30 @@ public class Main {
             timer = new MillisTimer();
         }
         return timer;
+    }
+
+    private static ArraysFactory getArraysFactory() {
+        if (arraysFactory == null) {
+            arraysFactory = createArraysFactory();
+        }
+        return arraysFactory;
+    }
+
+    private static ArraysFactory createArraysFactory() {
+        ArraysFactory arraysFactory = new SingleArraysFactory();
+        if (MIXED_ARRAY) {
+            arraysFactory = new MixedArraysFactory(arraysFactory);
+        }
+        if (CACHE_ARRAY) {
+            arraysFactory = new CacheArraysFactory(arraysFactory);
+        }
+        if (MULTIPLE) {
+            arraysFactory = new SynchronizeArraysFactory(arraysFactory);
+        }
+        if (COPY_ARRAY) {
+            arraysFactory = new CopyArraysFactory(arraysFactory);
+        }
+        return arraysFactory;
     }
 
     private static Config getConfig() {
@@ -147,7 +167,6 @@ public class Main {
                 MAX_ARRAY_LENGTH,
                 STEP,
                 ITERATIONS,
-                TIME_RANGE,
                 PATH_PREFIX,
                 PATH_SUFFIX
         );
