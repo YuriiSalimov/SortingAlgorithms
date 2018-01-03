@@ -1,4 +1,4 @@
-package com.sorting.tester.tester;
+package com.sorting.demonstration.tester;
 
 public interface Tester {
 
