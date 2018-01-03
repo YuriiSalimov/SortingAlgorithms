@@ -6,6 +6,7 @@ public final class Config {
     private final int maxArrayLength;
     private final int arrayLengthStep;
     private final int iterations;
+    private final double timeRange;
     private final String resultPathPrefix;
     private final String resultPathSuffix;
 
@@ -14,6 +15,7 @@ public final class Config {
             final int maxArrayLength,
             final int arrayLengthStep,
             final int iterations,
+            final double timeRange,
             final String resultPathPrefix,
             final String resultPathSuffix
     ) {
@@ -21,6 +23,7 @@ public final class Config {
         this.maxArrayLength = maxArrayLength;
         this.arrayLengthStep = arrayLengthStep;
         this.iterations = iterations;
+        this.timeRange = timeRange;
         this.resultPathPrefix = resultPathPrefix;
         this.resultPathSuffix = resultPathSuffix;
     }
@@ -39,6 +42,10 @@ public final class Config {
 
     public int getIterations() {
         return this.iterations;
+    }
+
+    public double getTimeRange() {
+        return this.timeRange;
     }
 
     public String getResultPathPrefix() {

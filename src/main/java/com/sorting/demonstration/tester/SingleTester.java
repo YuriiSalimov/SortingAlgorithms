@@ -16,6 +16,7 @@ public final class SingleTester implements Tester {
     private final SortTimer timer;
     private final ArraysFactory arraysFactory;
     private final Config config;
+    private final TimeCache timeCache = new TimeCache();
 
     public SingleTester(
             final String name,
@@ -58,15 +59,42 @@ public final class SingleTester implements Tester {
     }
 
     private double calcTime(final int arrayLength) {
-        double time = 0;
+        double sumTime = 0;
+        this.timeCache.clearTime();
         for (int i = 0; i < this.config.getIterations(); i++) {
             final int[] array = this.arraysFactory.create(arrayLength);
-            time += (this.timer.calcTime(array) / this.config.getIterations());
+            final double time = this.timer.calcTime(array);
+            if (this.timeCache.isValidTime(time)) {
+                sumTime += time / this.config.getIterations();
+                this.timeCache.saveTime(time);
+            } else {
+                i--;
+            }
         }
-        return time;
+        return sumTime;
     }
 
     private String getPath() {
         return this.config.getResultPathPrefix() + this.name + this.config.getResultPathSuffix();
+    }
+
+    private final class TimeCache {
+
+        private double prevTime;
+        private double prevPrevTime;
+
+        private boolean isValidTime(final double time) {
+            return (this.prevPrevTime == 0) || (time <= this.prevPrevTime * (1 + config.getTimeRange()));
+        }
+
+        private void saveTime(final double time) {
+            this.prevPrevTime = this.prevTime;
+            this.prevTime = time;
+        }
+
+        private void clearTime() {
+            this.prevPrevTime = 0;
+            this.prevTime = 0;
+        }
     }
 }

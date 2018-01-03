@@ -34,11 +34,12 @@ public class Main {
         NANOS, MILLIS, SECONDS
     }
 
-    private static final TimeUnits TIME_UNIT = TimeUnits.MILLIS;
-    private static final int MIN_ARRAY_LENGTH = 10;
-    private static final int MAX_ARRAY_LENGTH = 1000;
-    private static final int STEP = 1;
-    private static final int ITERATIONS = 10000;
+    private static final TimeUnits TIME_UNIT = TimeUnits.SECONDS;
+    private static final double TIME_RANGE = 0.05;
+    private static final int MIN_ARRAY_LENGTH = 10000;
+    private static final int MAX_ARRAY_LENGTH = 300000;
+    private static final int STEP = 10000;
+    private static final int ITERATIONS = 100;
     private static final boolean MIXED_ARRAY = true;
     private static final boolean CACHE_ARRAY = true;
     private static final boolean COPY_ARRAY = true;
@@ -67,6 +68,7 @@ public class Main {
         test(new RecursiveInsertionSort());
         test(new SelectionSort());
         test(new ShellSort());
+
         executorShutdown();
     }
 
@@ -167,6 +169,7 @@ public class Main {
                 MAX_ARRAY_LENGTH,
                 STEP,
                 ITERATIONS,
+                TIME_RANGE,
                 PATH_PREFIX,
                 PATH_SUFFIX
         );
