@@ -1,4 +1,4 @@
-package com.sorting.tester.timer;
+package com.sorting.demonstration.timer;
 
 abstract class AbstractTimer implements Timer {
 

@@ -1,4 +1,4 @@
-package com.sorting.tester.timer;
+package com.sorting.demonstration.timer;
 
 public final class NanoTimer extends AbstractTimer {
 
