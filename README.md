@@ -1,4 +1,4 @@
-### Sorting algorithms implementations
+## Sorting algorithms implementations
 
 * [Bogo Sort](/src/main/java/com/sorting/algorithms/BogoSort)
 * [Bubble Sort](/src/main/java/com/sorting/algorithms/BubbleSort)
@@ -17,7 +17,7 @@
 * [Selection Sort](/src/main/java/com/sorting/algorithms/SelectionSort)
 * [Shell Sort](/src/main/java/com/sorting/algorithms/ShellSort)
 
-#### Time Comparison of Sort Algorithms
+### Time Comparison of Sort Algorithms
 array length = [10, 1000]
 
 iterations = 100
