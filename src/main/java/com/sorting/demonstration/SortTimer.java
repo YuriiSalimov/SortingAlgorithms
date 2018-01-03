@@ -1,7 +1,7 @@
-package com.sorting.tester;
+package com.sorting.demonstration;
 
 import com.sorting.algorithms.Sort;
-import com.sorting.tester.timer.Timer;
+import com.sorting.demonstration.timer.Timer;
 
 public final class SortTimer {
 
