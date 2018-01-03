@@ -1,36 +1,36 @@
-package com.sorting.tester;
+package com.sorting.tester.tester;
 
-import com.sorting.algorithms.Sort;
+import com.sorting.tester.Config;
+import com.sorting.tester.Loader;
+import com.sorting.tester.SortTimer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-public final class Tester {
+public final class SingleTester implements Tester {
 
-    private static final int MIN_ARRAY_LENGTH = 1000;
-    private static final int MAX_ARRAY_LENGTH = 10000;
-    private static final int STEP = 10000;
-    private static final int ITERATIONS = 100;
-    private static final String PATH_PREFIX = "results/";
-    private static final String PATH_SUFFIX = ".sort";
-    private static final double TIME_RANGE = 0.3;
     private static final Random RANDOM = new Random();
 
-    private final Sort sort;
+    private final String name;
+    private final SortTimer timer;
+    private final Config config;
+
     private long prevTime;
     private long prevPrevTime;
 
-    public Tester(final Sort sort) {
-        this.sort = sort;
+    public SingleTester(final String name, final SortTimer timer, final Config config) {
+        this.name = name;
+        this.timer = timer;
+        this.config = config;
     }
 
-    public void run() {
+    @Override
+    public void test() {
         try {
-            System.out.println(getSortName() + " - start");
+            System.out.println(this.name + " - start");
             final String table = createTable();
             saveTable(table);
-            System.out.println(getSortName() + " - DONE");
+            System.out.println(this.name + " - DONE");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -38,10 +38,10 @@ public final class Tester {
 
     private String createTable() {
         final StringBuilder sb = new StringBuilder();
-        for (int i = MIN_ARRAY_LENGTH; i <= MAX_ARRAY_LENGTH; i += STEP) {
+        for (int i = this.config.getMinArrayLength(); i <= this.config.getMaxArrayLength(); i += this.config.getArrayLengthStep()) {
             final long time = calcTime(i);
             if (isValidTime(time)) {
-                i -= STEP;
+                i -= this.config.getArrayLengthStep();
             } else {
                 saveTime(time);
                 sb.append(i).append(" ").append(time).append("\n");
@@ -58,12 +58,11 @@ public final class Tester {
 
     private long calcTime(final int arrayLength) {
         long time = 0;
-        for (int i = 0; i < ITERATIONS; i++) {
+        for (int i = 0; i < this.config.getIterations(); i++) {
             final int[] array = createArray(arrayLength);
-            final SortTimer timer = new SortTimer(this.sort, array);
-            time += timer.sort();
+            time += this.timer.calcTime(array);
         }
-        return (time / ITERATIONS);
+        return (time / this.config.getIterations());
     }
 
     private int[] createArray(final int length) {
@@ -76,7 +75,7 @@ public final class Tester {
 
     private boolean isValidTime(final long time) {
         return (this.prevPrevTime != 0) &&
-                (time - this.prevPrevTime) > ((double) this.prevPrevTime * TIME_RANGE);
+                (time - this.prevPrevTime) > ((double) this.prevPrevTime * this.config.getTimeRange());
     }
 
     private void saveTime(final long time) {
@@ -85,10 +84,6 @@ public final class Tester {
     }
 
     private String getPath() {
-        return PATH_PREFIX + getSortName() + PATH_SUFFIX;
-    }
-
-    private String getSortName() {
-        return this.sort.getClass().getSimpleName();
+        return this.config.getResultPathPrefix() + this.name + this.config.getResultPathSuffix();
     }
 }
